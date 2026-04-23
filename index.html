@@ -12,6 +12,8 @@
             --bg-deep: #0a0a0a;
             --text-gray: #c0c0c0;
             --white-shirt: #ffffff;
+            /* 跨平台明體字型設定 */
+            --font-serif: "Noto Serif TC", "Songti TC", "Apple LiSung", "微軟新細明體", "PMingLiU", serif;
         }
 
         body, html {
@@ -20,8 +22,10 @@
             width: 100%;
             background-color: var(--bg-deep);
             color: var(--text-gray);
-            font-family: 'Noto Serif TC', serif;
+            /* 全域套用明體 */
+            font-family: var(--font-serif);
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
         /* --- 視覺花樣：深夜監控感 --- */
@@ -36,16 +40,28 @@
             pointer-events: none;
         }
 
-        /* --- 動態背景：機密字樣浮水印 --- */
-        .watermark {
+        /* --- 動態背景：非制式浮水印容器 --- */
+        #watermark-container {
             position: fixed;
-            font-size: 10vw;
-            color: rgba(255, 255, 255, 0.02);
-            font-weight: 900;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .watermark {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.03);
+            font-weight: 900;
             white-space: nowrap;
             user-select: none;
-            pointer-events: none;
+            transition: transform 0.1s ease-out;
+            /* 浮水印亦套用明體，增加文件感 */
+            font-family: var(--font-serif);
+            line-height: 1;
         }
 
         /* --- 容器 --- */
@@ -60,7 +76,7 @@
             min-height: 100vh;
         }
 
-        /* --- 標題：位階感設計 --- */
+        /* --- 標題設計 --- */
         .header {
             text-align: left;
             margin-bottom: 80px;
@@ -72,14 +88,16 @@
             letter-spacing: 5px;
             text-transform: uppercase;
             margin-bottom: 10px;
+            font-weight: 700;
         }
 
         .header h1 {
             font-size: 2.5rem;
             font-weight: 900;
             color: var(--white-shirt);
-            line-height: 1.2;
+            line-height: 1.3;
             margin: 0;
+            letter-spacing: 2px;
         }
 
         .header .sub-host {
@@ -110,15 +128,17 @@
             font-size: 0.8rem;
             margin-bottom: 15px;
             font-weight: bold;
+            letter-spacing: 1px;
         }
 
         .content-box {
             border-left: 2px solid var(--gold);
             padding-left: 20px;
             margin-left: 5px;
+            line-height: 1.8;
         }
 
-        /* --- 花樣：紅筆批改效果 --- */
+        /* --- 紅筆批改效果 --- */
         .red-mark {
             position: relative;
             display: inline-block;
@@ -129,7 +149,7 @@
         .red-mark::after {
             content: "";
             position: absolute;
-            bottom: -2px; left: -5%; width: 110%;
+            bottom: 2px; left: -5%; width: 110%;
             height: 8px;
             background: rgba(179, 0, 0, 0.4);
             z-index: -1;
@@ -158,7 +178,7 @@
             transform: rotate(45deg);
         }
 
-        /* --- 回覆按鈕：壓迫感與誘惑力 --- */
+        /* --- 回覆按鈕 --- */
         .rsvp-container {
             text-align: center;
             margin-top: 100px;
@@ -176,6 +196,7 @@
             position: relative;
             transition: all 0.4s;
             background: transparent;
+            font-family: var(--font-serif);
         }
 
         .btn-obey:hover {
@@ -194,7 +215,6 @@
             font-size: 0.7rem;
         }
 
-        /* --- 分隔線 --- */
         .divider {
             height: 1px;
             background: linear-gradient(90deg, transparent, var(--gold), transparent);
@@ -205,19 +225,17 @@
 </head>
 <body>
 
-    <div class="watermark" style="top: 10%; left: -5%;">CONFIDENTIAL</div>
-    <div class="watermark" style="top: 40%; right: -5%;">RESTRICTED</div>
-    <div class="watermark" style="bottom: 10%; left: 5%;">RULE & DISCIPLINE</div>
+    <div id="watermark-container"></div>
 
     <div class="wrapper">
         
         <header class="header">
-            <h2 class="fade-in">Private Lesson: 001</h2>
-            <h1 class="fade-in">《Rule & Discipline》<br>禁夜課程</h1>
-            <div class="sub-host fade-in">菟犽（feat. 牙）🐰🦷</div>
+            <h2>Private Lesson: 001</h2>
+            <h1>《Rule & Discipline》<br>禁夜課程</h1>
+            <div class="sub-host">菟犽（feat. 牙）🐰🦷</div>
         </header>
 
-        <section class="section visible">
+        <section class="section">
             <span class="discipline-label">COURSE INTRO</span>
             <div class="content-box">
                 我們的菟犽同學第一次舉辦私聚，在有限的時間裡，邀請<span class="red-mark">最特別的你</span>參與。這是一場關於規則與放鬆的深夜實驗。
@@ -270,8 +288,44 @@
     </div>
 
     <script>
-        // 滾動偵測：讓區塊逐一浮現
-        const observerOptions = { threshold: 0.2 };
+        // 1. 動態隨機浮水印邏輯
+        const container = document.getElementById('watermark-container');
+        const words = ['CONFIDENTIAL', 'RESTRICTED', 'RULE & DISCIPLINE', 'PRIVATE', 'TOP SECRET', 'OBEY'];
+        const isMobile = window.innerWidth < 768;
+        
+        // 根據螢幕大小決定生成的數量
+        const watermarkCount = isMobile ? 15 : 10;
+
+        for (let i = 0; i < watermarkCount; i++) {
+            const el = document.createElement('div');
+            el.className = 'watermark';
+            el.innerText = words[Math.floor(Math.random() * words.length)];
+            
+            // 隨機位置 (0% - 90%)
+            const top = Math.random() * 100;
+            const left = Math.random() * 100 - 10;
+            
+            // 隨機旋轉角度 (-45deg 到 45deg)
+            const rotate = (Math.random() - 0.5) * 90;
+            
+            // 隨機字體大小
+            const fontSize = isMobile 
+                ? (Math.random() * 12 + 10) // 手機端較大且隨機感強
+                : (Math.random() * 5 + 6);   // 電腦端較精緻
+
+            el.style.top = `${top}%`;
+            el.style.left = `${left}%`;
+            el.style.fontSize = `${fontSize}vw`;
+            el.style.transform = `rotate(${rotate}deg)`;
+            
+            // 給予不同的初始偏移量，增加滑鼠移動時的層次感
+            el.setAttribute('data-speed', (Math.random() * 30 + 20).toString());
+            
+            container.appendChild(el);
+        }
+
+        // 2. 滾動偵測：讓區塊逐一浮現
+        const observerOptions = { threshold: 0.15 };
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -284,12 +338,19 @@
             observer.observe(section);
         });
 
-        // 滑鼠移動效果：背景浮水印微動
+        // 3. 滑鼠/手指移動效果：背景浮水印非線性微動
         document.addEventListener('mousemove', (e) => {
-            const moveX = (e.clientX - window.innerWidth / 2) / 50;
-            const moveY = (e.clientY - window.innerHeight / 2) / 50;
+            const x = e.clientX;
+            const y = e.clientY;
+            
             document.querySelectorAll('.watermark').forEach(el => {
-                el.style.transform = `translate(${moveX}px, ${moveY}px)`;
+                const speed = parseFloat(el.getAttribute('data-speed'));
+                const moveX = (x - window.innerWidth / 2) / speed;
+                const moveY = (y - window.innerHeight / 2) / speed;
+                
+                // 保持原有的旋轉角度並加上位移
+                const currentRotate = el.style.transform.split('rotate(')[1];
+                el.style.transform = `translate(${moveX}px, ${moveY}px) rotate(${currentRotate}`;
             });
         });
     </script>
