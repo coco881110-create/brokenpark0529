@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>禁夜課程｜Rule & Discipline</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent-red: #b30000;
+            --gold: #d4af37;
+            --bg-deep: #0a0a0a;
+            --text-gray: #c0c0c0;
+            --white-shirt: #ffffff;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            background-color: var(--bg-deep);
+            color: var(--text-gray);
+            font-family: 'Noto Serif TC', serif;
+            overflow-x: hidden;
+        }
+
+        /* --- 視覺花樣：深夜監控感 --- */
+        body::before {
+            content: " ";
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
+                        linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 100;
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+        }
+
+        /* --- 動態背景：機密字樣浮水印 --- */
+        .watermark {
+            position: fixed;
+            font-size: 10vw;
+            color: rgba(255, 255, 255, 0.02);
+            font-weight: 900;
+            z-index: 0;
+            white-space: nowrap;
+            user-select: none;
+            pointer-events: none;
+        }
+
+        /* --- 容器 --- */
+        .wrapper {
+            position: relative;
+            z-index: 10;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 100px 30px;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            min-height: 100vh;
+        }
+
+        /* --- 標題：位階感設計 --- */
+        .header {
+            text-align: left;
+            margin-bottom: 80px;
+        }
+
+        .header h2 {
+            font-size: 1rem;
+            color: var(--accent-red);
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--white-shirt);
+            line-height: 1.2;
+            margin: 0;
+        }
+
+        .header .sub-host {
+            font-size: 1.2rem;
+            color: var(--gold);
+            margin-top: 15px;
+            font-style: italic;
+        }
+
+        /* --- 內容區塊 --- */
+        .section {
+            margin-bottom: 60px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1s ease;
+        }
+
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .discipline-label {
+            display: inline-block;
+            background: var(--accent-red);
+            color: white;
+            padding: 2px 10px;
+            font-size: 0.8rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .content-box {
+            border-left: 2px solid var(--gold);
+            padding-left: 20px;
+            margin-left: 5px;
+        }
+
+        /* --- 花樣：紅筆批改效果 --- */
+        .red-mark {
+            position: relative;
+            display: inline-block;
+            color: var(--white-shirt);
+            font-weight: 700;
+        }
+
+        .red-mark::after {
+            content: "";
+            position: absolute;
+            bottom: -2px; left: -5%; width: 110%;
+            height: 8px;
+            background: rgba(179, 0, 0, 0.4);
+            z-index: -1;
+            transform: rotate(-1deg);
+            border-radius: 50% 20%;
+        }
+
+        /* --- JK Dress Code 特別標示 --- */
+        .jk-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .jk-card::before {
+            content: "UNIFORM REQUIRED";
+            position: absolute;
+            top: 5px; right: -30px;
+            background: var(--gold);
+            color: black;
+            font-size: 0.6rem;
+            font-weight: 900;
+            padding: 5px 40px;
+            transform: rotate(45deg);
+        }
+
+        /* --- 回覆按鈕：壓迫感與誘惑力 --- */
+        .rsvp-container {
+            text-align: center;
+            margin-top: 100px;
+        }
+
+        .btn-obey {
+            display: inline-block;
+            padding: 20px 60px;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            position: relative;
+            transition: all 0.4s;
+            background: transparent;
+        }
+
+        .btn-obey:hover {
+            background: var(--gold);
+            color: black;
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-obey::before {
+            content: "ACCEPT THE RULE";
+            position: absolute;
+            top: -12px; left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-deep);
+            padding: 0 10px;
+            font-size: 0.7rem;
+        }
+
+        /* --- 分隔線 --- */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            margin: 40px 0;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="watermark" style="top: 10%; left: -5%;">CONFIDENTIAL</div>
+    <div class="watermark" style="top: 40%; right: -5%;">RESTRICTED</div>
+    <div class="watermark" style="bottom: 10%; left: 5%;">RULE & DISCIPLINE</div>
+
+    <div class="wrapper">
+        
+        <header class="header">
+            <h2 class="fade-in">Private Lesson: 001</h2>
+            <h1 class="fade-in">《Rule & Discipline》<br>禁夜課程</h1>
+            <div class="sub-host fade-in">菟犽（feat. 牙）🐰🦷</div>
+        </header>
+
+        <section class="section visible">
+            <span class="discipline-label">COURSE INTRO</span>
+            <div class="content-box">
+                我們的菟犽同學第一次舉辦私聚，在有限的時間裡，邀請<span class="red-mark">最特別的你</span>參與。這是一場關於規則與放鬆的深夜實驗。
+            </div>
+        </section>
+
+        <section class="section">
+            <span class="discipline-label">SCHEDULE</span>
+            <div class="content-box">
+                <strong>DATE /</strong> 2026.05.29 - 30<br>
+                <strong>CHECK-IN /</strong> 19:30 入場<br>
+                <strong>START /</strong> 20:30 <span class="red-mark">活動正式開始</span>
+            </div>
+        </section>
+
+        <section class="section">
+            <span class="discipline-label">LOGISTICS</span>
+            <div class="content-box">
+                <strong>COST /</strong> NT:600 per person<br>
+                <strong>OVERNIGHT /</strong> 自由決定是否過夜<br>
+                <strong>FOOD /</strong> 歡迎攜帶私藏食物進場
+            </div>
+        </section>
+
+        <section class="section">
+            <span class="discipline-label">REQUIREMENTS</span>
+            <div class="jk-card">
+                <strong>DRESS CODE：<span class="red-mark">JK制服</span></strong><br>
+                <p style="font-size: 0.9rem; color: #888; margin-top: 10px;">
+                    ※ 男主動方可著「白色襯衫」，象徵教導者位階。
+                </p>
+            </div>
+        </section>
+
+        <section class="section">
+            <span class="discipline-label">CORE CONTENT</span>
+            <div class="content-box" style="font-style: italic;">
+                主要核心是 Chill 氛圍<br>
+                並搭配一些<span class="red-mark">懲戒劇情</span>的展開...
+            </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <div class="rsvp-container section">
+            <a href="https://x.com/brokenpark22?s=21" class="btn-obey">下週揭曉，敬請期待</a>
+            <p style="font-size: 0.8rem; margin-top: 20px; color: #555;">一旦進入課程，請絕對服從規範。</p>
+        </div>
+
+    </div>
+
+    <script>
+        // 滾動偵測：讓區塊逐一浮現
+        const observerOptions = { threshold: 0.2 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.section').forEach(section => {
+            observer.observe(section);
+        });
+
+        // 滑鼠移動效果：背景浮水印微動
+        document.addEventListener('mousemove', (e) => {
+            const moveX = (e.clientX - window.innerWidth / 2) / 50;
+            const moveY = (e.clientY - window.innerHeight / 2) / 50;
+            document.querySelectorAll('.watermark').forEach(el => {
+                el.style.transform = `translate(${moveX}px, ${moveY}px)`;
+            });
+        });
+    </script>
+</body>
+</html>
