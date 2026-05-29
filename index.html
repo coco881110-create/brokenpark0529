@@ -15,65 +15,155 @@
             --font-serif: "Noto Serif TC", "Songti TC", "Apple LiSung", "微軟新細明體", "PMingLiU", serif;
         }
 
-        body { margin: 0; background-color: var(--bg-deep); color: var(--text-gray); font-family: var(--font-serif); }
+        body, html { margin: 0; padding: 0; width: 100%; background-color: var(--bg-deep); color: var(--text-gray); font-family: var(--font-serif); overflow-x: hidden; -webkit-font-smoothing: antialiased; }
 
-        .wrapper { max-width: 600px; margin: 0 auto; padding: 100px 30px; }
+        body::before { content: " "; position: fixed; top: 0; left: 0; bottom: 0; right: 0; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06)); z-index: 100; background-size: 100% 4px, 3px 100%; pointer-events: none; }
 
-        /* --- 修正後的靜態按鈕與印章 --- */
-        .rsvp-container { text-align: center; margin-top: 100px; position: relative; }
+        #watermark-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; overflow: hidden; }
+
+        .watermark { position: absolute; color: rgba(255, 255, 255, 0.03); font-weight: 900; white-space: nowrap; user-select: none; transition: transform 0.1s ease-out; font-family: var(--font-serif); line-height: 1; }
+
+        .wrapper { position: relative; z-index: 10; max-width: 600px; margin: 0 auto; padding: 100px 30px; border-left: 1px solid rgba(255, 255, 255, 0.1); border-right: 1px solid rgba(255, 255, 255, 0.1); min-height: 100vh; }
+
+        .header { text-align: left; margin-bottom: 80px; }
+        .header h2 { font-size: 1rem; color: var(--accent-red); letter-spacing: 5px; text-transform: uppercase; margin-bottom: 10px; font-weight: 700; }
+        .header h1 { font-size: 2.5rem; font-weight: 900; color: var(--white-shirt); line-height: 1.3; margin: 0; letter-spacing: 2px; }
+        .header .sub-host { font-size: 1.2rem; color: var(--gold); margin-top: 15px; font-style: italic; }
+
+        .section { margin-bottom: 60px; opacity: 0; transform: translateY(20px); transition: all 1s ease; }
+        .section.visible { opacity: 1; transform: translateY(0); }
+
+        .discipline-label { display: inline-block; background: var(--accent-red); color: white; padding: 2px 10px; font-size: 0.8rem; margin-bottom: 15px; font-weight: bold; letter-spacing: 1px; }
+        .content-box { border-left: 2px solid var(--gold); padding-left: 20px; margin-left: 5px; line-height: 1.8; }
+        .red-mark { position: relative; display: inline-block; color: var(--white-shirt); font-weight: 700; }
+        .red-mark::after { content: ""; position: absolute; bottom: 2px; left: -5%; width: 110%; height: 8px; background: rgba(179, 0, 0, 0.4); z-index: -1; transform: rotate(-1deg); border-radius: 50% 20%; }
+
+        .jk-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); padding: 25px; position: relative; overflow: hidden; }
+        .jk-card::before { content: "UNIFORM REQUIRED"; position: absolute; top: 5px; right: -30px; background: var(--gold); color: black; font-size: 0.6rem; font-weight: 900; padding: 5px 40px; transform: rotate(45deg); }
+
+        /* --- 修正後的靜態按鈕與蓋章 --- */
+        .rsvp-container { text-align: center; margin-top: 100px; }
+        .btn-obey { 
+            display: inline-block; padding: 20px 60px; border: 1px solid var(--gold); color: var(--gold); 
+            font-size: 1.2rem; font-weight: 700; letter-spacing: 3px; position: relative; background: transparent;
+            cursor: default; pointer-events: none;
+        }
+        .btn-obey::after {
+            content: "確定入場"; position: absolute; top: -15px; right: -20px; width: 90px; height: 90px;
+            border: 3px double var(--accent-red); border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            color: var(--accent-red); font-size: 0.8rem; transform: rotate(-15deg); background: rgba(179, 0, 0, 0.15);
+            text-align: center; line-height: 1.2; font-weight: 900;
+        }
+        .btn-obey::before { content: "CONFIRMED"; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--bg-deep); padding: 0 10px; font-size: 0.7rem; }
         
-        .btn-obey {
-            display: inline-block;
-            padding: 20px 60px;
-            border: 1px solid var(--gold);
-            color: var(--gold);
-            font-size: 1.2rem;
-            font-weight: 700;
-            letter-spacing: 3px;
-            background: transparent;
-            pointer-events: none; /* 禁止交互 */
-            cursor: default;      /* 滑鼠不變手指 */
-        }
-
-        .stamp {
-            position: absolute;
-            bottom: -30px;
-            right: 20px;
-            width: 120px;
-            height: 120px;
-            border: 3px double var(--accent-red);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--accent-red);
-            font-weight: 900;
-            font-size: 0.9rem;
-            transform: rotate(-15deg);
-            background: rgba(179, 0, 0, 0.1);
-            z-index: 20;
-        }
-
-        .stamp::before { content: "確"; display: block; font-size: 2rem; }
+        .divider { height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); margin: 40px 0; }
     </style>
 </head>
 <body>
-
+    <div id="watermark-container"></div>
     <div class="wrapper">
         <header class="header">
+            <h2>Private Lesson: 001</h2>
             <h1>《Rule & Discipline》<br>禁夜課程</h1>
+            <div class="sub-host">菟犽（feat. 牙）🐰🦷</div>
         </header>
 
-        <div class="rsvp-container">
-            <div class="btn-obey">
-                已登錄・准許入座
-                <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #0a0a0a; padding: 0 10px; font-size: 0.7rem; color: #d4af37;">
-                    CONFIRMED
-                </div>
+        <section class="section">
+            <span class="discipline-label">COURSE INTRO</span>
+            <div class="content-box">我們的菟犽同學第一次舉辦私聚，在有限的時間裡，邀請<span class="red-mark">最特別的你</span>參與。這是一場關於規則與放鬆的深夜實驗。</div>
+        </section>
+
+        <section class="section">
+            <span class="discipline-label">SCHEDULE</span>
+            <div class="content-box">
+                <strong>DATE /</strong> 2026.05.29 - 30<br>
+                <strong>CHECK-IN /</strong> 19:00 入場<br>
+                <strong>START /</strong> 20:00 <span class="red-mark">活動正式開始</span><br>
+                <strong>CHECK-OUT /</strong> 11:00 下課<br>
             </div>
-            <div class="stamp">定入場</div>
+        </section>
+
+        <section class="section">
+            <span class="discipline-label">LOGISTICS</span>
+            <div class="content-box">
+                <strong>COST /</strong> NT:600 per person<br>
+                <strong>OVERNIGHT /</strong> 自由決定是否過夜<br>
+                <strong>DRINK & SNACK /</strong> 提供簡易酒水與點心<br>
+                <strong>NOTICE /</strong> 建議用餐後前往，避免空腹飲酒
+            </div>
+        </section>
+
+        <section class="section">
+            <span class="discipline-label">ACCESS & LOCATION</span>
+            <div class="content-box">
+                <strong>📍 地址 /</strong> 台北市大同區長安西路243號1樓<br>
+                <a href="#" style="color:var(--gold); text-decoration: underline;">查看地圖定位</a>
+            </div>
+            <div class="content-box" style="margin-top: 15px;">
+                <strong>🔗 進出規範 /</strong> <a href="https://reurl.cc/jmnvG2" style="color:var(--gold); text-decoration: underline;">開啟說明指引</a>
+                <p style="font-size: 0.8rem; color: #888; margin-top: 5px;">※ 請於入場前詳細閱讀，違者依課程規則處置。</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <span class="discipline-label">REQUIREMENTS</span>
+            <div class="jk-card">
+                <strong>DRESS CODE：<span class="red-mark">JK制服</span></strong><br>
+                <p style="font-size: 0.9rem; color: #888; margin-top: 10px;">※ 男主動方可著「白色襯衫」，象徵教導者位階。</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <span class="discipline-label">CORE CONTENT</span>
+            <div class="content-box" style="font-style: italic;">主要核心是 Chill 氛圍<br>並搭配一些<span class="red-mark">懲戒劇情</span>的展開...</div>
+        </section>
+
+        <div class="divider"></div>
+
+        <div class="rsvp-container section">
+            <div class="btn-obey">已登錄・准許入座</div>
+            <p style="font-size: 0.8rem; margin-top: 30px; color: #555;">一旦進入課程，請絕對服從規範。</p>
         </div>
     </div>
 
+    <script>
+        const container = document.getElementById('watermark-container');
+        const words = ['CONFIDENTIAL', 'RESTRICTED', 'RULE & DISCIPLINE', 'PRIVATE', 'TOP SECRET', 'OBEY'];
+        const isMobile = window.innerWidth < 768;
+        const watermarkCount = isMobile ? 15 : 10;
+
+        for (let i = 0; i < watermarkCount; i++) {
+            const el = document.createElement('div');
+            el.className = 'watermark';
+            el.innerText = words[Math.floor(Math.random() * words.length)];
+            const top = Math.random() * 100;
+            const left = Math.random() * 100 - 10;
+            const rotate = (Math.random() - 0.5) * 90;
+            const fontSize = isMobile ? (Math.random() * 12 + 10) : (Math.random() * 5 + 6);
+            el.style.top = `${top}%`;
+            el.style.left = `${left}%`;
+            el.style.fontSize = `${fontSize}vw`;
+            el.style.transform = `rotate(${rotate}deg)`;
+            el.setAttribute('data-speed', (Math.random() * 30 + 20).toString());
+            container.appendChild(el);
+        }
+
+        const observerOptions = { threshold: 0.15 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+        }, observerOptions);
+        document.querySelectorAll('.section').forEach(section => observer.observe(section));
+
+        document.addEventListener('mousemove', (e) => {
+            const x = e.clientX; const y = e.clientY;
+            document.querySelectorAll('.watermark').forEach(el => {
+                const speed = parseFloat(el.getAttribute('data-speed'));
+                const moveX = (x - window.innerWidth / 2) / speed;
+                const moveY = (y - window.innerHeight / 2) / speed;
+                const currentRotate = el.style.transform.split('rotate(')[1];
+                el.style.transform = `translate(${moveX}px, ${moveY}px) rotate(${currentRotate}`;
+            });
+        });
+    </script>
 </body>
 </html>
